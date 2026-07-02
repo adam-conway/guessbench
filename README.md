@@ -2,6 +2,29 @@
 
 **A benchmark for your prompts, not your model.** guessbench measures how much interpretive guesswork a text artifact — a prompt, a spec, a task description — forces on a model, and reports it as a single number: **Effective Interpretations (EI)**. EI = 1.0 means the artifact pins down one reading. EI = 4.2 means the model is effectively coin-flipping among ~4 distinct readings, and every downstream token is built on that guess.
 
+```mermaid
+flowchart LR
+    artifact["artifact<br/>&quot;Write a sorting function.&quot;"]
+    samples["20 completions<br/>(T = 1.0)"]
+    c1["Python, ascending<br/>9 samples"]
+    c2["Python, descending<br/>6 samples"]
+    c3["JavaScript<br/>4 samples"]
+    c4["asks clarifying question<br/>1 sample"]
+    ei["H = 1.19 nats<br/>EI ≈ 3.3 effective readings"]
+
+    artifact -->|"sample x20"| samples
+    samples -->|"cluster by meaning"| c1
+    samples --> c2
+    samples --> c3
+    samples --> c4
+    c1 --> ei
+    c2 --> ei
+    c3 --> ei
+    c4 --> ei
+```
+
+The same task written as a full behavioral spec collapses all 20 samples into one cluster: EI = 1.0.
+
 ## The idea
 
 An artifact induces a distribution over interpretations in a model. A fully specified artifact collapses that distribution to a point; a vague one leaves it wide. You can't observe the distribution directly, but you can estimate its entropy:
