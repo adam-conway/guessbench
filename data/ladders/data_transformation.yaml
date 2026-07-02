@@ -1,0 +1,31 @@
+# Ladder: data transformation.
+family: data transformation
+status: PENDING_REVIEW
+levels:
+  - level: 1
+    prompt: "Convert this data: name=Alice age=31; name=Bob age=25; name=Carol age=40"
+    dimensions_resolved: []
+  - level: 2
+    prompt: >-
+      Convert this data to JSON: name=Alice age=31; name=Bob age=25; name=Carol age=40
+    dimensions_resolved: [target format (JSON)]
+  - level: 3
+    prompt: >-
+      Convert this data to a JSON array of objects, each with keys "name" (string)
+      and "age" (number): name=Alice age=31; name=Bob age=25; name=Carol age=40
+    dimensions_resolved: [top-level shape (array of objects), key names, value types]
+  - level: 4
+    prompt: >-
+      Convert this data to a JSON array of objects, each with keys "name" (string)
+      and "age" (number), preserving the original record order:
+      name=Alice age=31; name=Bob age=25; name=Carol age=40.
+      Output only the JSON — no explanation, no code fences.
+    dimensions_resolved: [record order, response format (bare JSON only)]
+  - level: 5
+    prompt: >-
+      Convert this data to JSON: name=Alice age=31; name=Bob age=25; name=Carol age=40.
+      Output exactly one line of minified JSON (no spaces after commas or colons, no
+      trailing newline text, no code fences, no prose): an array of objects in the
+      original record order, each with key "name" (string) then key "age" (number),
+      in that key order.
+    dimensions_resolved: [minification and whitespace, key order within objects, single-line output]

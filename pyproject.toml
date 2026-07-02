@@ -1,0 +1,32 @@
+[project]
+name = "guessbench"
+version = "0.1.0"
+description = "Guesswork Benchmark v0 - Interpretation Entropy Scorer"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "scikit-learn>=1.4",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4"]
+
+[project.scripts]
+guessbench = "guessbench.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["guessbench*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

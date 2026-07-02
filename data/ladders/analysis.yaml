@@ -1,0 +1,38 @@
+# Ladder: short analysis / recommendation.
+family: short analysis/recommendation
+status: PENDING_REVIEW
+levels:
+  - level: 1
+    prompt: "Should we switch tools? Give a recommendation."
+    dimensions_resolved: []
+  - level: 2
+    prompt: >-
+      A 10-person software team currently tracks work in spreadsheets. Should they
+      switch to a dedicated issue tracker? Give a short recommendation.
+    dimensions_resolved: [subject (issue tracker vs spreadsheets), team context, length (short)]
+  - level: 3
+    prompt: >-
+      A 10-person software team currently tracks work in spreadsheets and misses
+      deadlines because tasks get lost. Should they switch to a dedicated issue
+      tracker? Recommend yes or no, then give exactly three supporting reasons.
+      Do not recommend any specific product.
+    dimensions_resolved: [problem statement, verdict format (yes/no), reason count, product neutrality]
+  - level: 4
+    prompt: >-
+      A 10-person software team currently tracks work in spreadsheets and misses
+      deadlines because tasks get lost. Should they switch to a dedicated issue
+      tracker? Structure your answer as: first line "Recommendation: Yes" or
+      "Recommendation: No", then exactly three bullet points, each one sentence,
+      each naming a concrete benefit or risk for THIS team. Do not recommend any
+      specific product. Do not mention cost.
+    dimensions_resolved: [exact verdict line, bullet structure, team-specific reasons, cost excluded]
+  - level: 5
+    prompt: >-
+      A 10-person software team currently tracks work in spreadsheets and misses
+      deadlines because tasks get lost. Recommend switching to a dedicated issue
+      tracker. Output exactly: line 1 "Recommendation: Yes", then exactly three
+      bullet points starting with "- ", each a single sentence under 25 words. Bullet
+      1 must be about task visibility, bullet 2 about accountability for deadlines,
+      bullet 3 about reducing manual status updates. No product names, no mention of
+      cost, no introduction or conclusion.
+    dimensions_resolved: [verdict pinned, per-bullet topic, sentence length cap, no framing text]

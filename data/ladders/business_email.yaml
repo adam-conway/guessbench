@@ -1,0 +1,36 @@
+# Ladder: business communication.
+family: business communication
+status: PENDING_REVIEW
+levels:
+  - level: 1
+    prompt: "Write an email about the meeting."
+    dimensions_resolved: []
+  - level: 2
+    prompt: >-
+      Write a short email to my team rescheduling this week's project sync meeting.
+    dimensions_resolved: [purpose (reschedule), audience (my team), length (short)]
+  - level: 3
+    prompt: >-
+      Write a short email to my team rescheduling this week's project sync from
+      Thursday 2pm to Friday 10am, because two key people have a conflict. Keep the
+      tone friendly and casual. Sign it "Sam".
+    dimensions_resolved: [old and new time, reason, tone, signature]
+  - level: 4
+    prompt: >-
+      Write a short email to my team rescheduling this week's project sync from
+      Thursday 2pm to Friday 10am, because two key people have a conflict. Keep the
+      tone friendly and casual. Sign it "Sam". Subject line must be "Project sync
+      moved to Friday 10am". Structure: one sentence announcing the change, one
+      sentence giving the reason (do not name the people), one sentence asking
+      recipients to update their calendars. Do not apologize.
+    dimensions_resolved: [exact subject line, sentence-level structure, privacy of names, no apology]
+  - level: 5
+    prompt: >-
+      Write an email with subject line exactly "Project sync moved to Friday 10am".
+      Greeting: exactly "Hi team,". Body: exactly three sentences. Sentence 1
+      announces this week's project sync moves from Thursday 2pm to Friday 10am.
+      Sentence 2 says the reason is a scheduling conflict, without naming anyone.
+      Sentence 3 asks recipients to update their calendars. No apology. Closing:
+      exactly "Thanks!" then "Sam" on the next line. Friendly and casual tone.
+      Output the subject line, then the email body — nothing else, no commentary.
+    dimensions_resolved: [exact greeting, exact closing, exact sentence count, response format]

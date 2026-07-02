@@ -1,0 +1,34 @@
+# Ladder: how-to instructions.
+family: how-to instructions
+status: PENDING_REVIEW
+levels:
+  - level: 1
+    prompt: "Explain how to make tea."
+    dimensions_resolved: []
+  - level: 2
+    prompt: "Write step-by-step instructions for making a cup of hot black tea with a tea bag."
+    dimensions_resolved: [tea type, method (tea bag), format (step-by-step), serving (one cup)]
+  - level: 3
+    prompt: >-
+      Write step-by-step instructions for making one cup of hot black tea with a tea
+      bag, for a complete beginner using a kettle and a mug. Use a numbered list.
+      Include steeping time.
+    dimensions_resolved: [audience, equipment, list format (numbered), steeping time included]
+  - level: 4
+    prompt: >-
+      Write step-by-step instructions for making one cup of hot black tea with a tea
+      bag, for a complete beginner using a kettle and a mug. Use a numbered list with
+      exactly 6 steps, one sentence per step. Steep for 3-5 minutes. Mention milk and
+      sugar only in the final step, as optional. Do not include any safety warnings.
+    dimensions_resolved: [step count, sentence-per-step, exact steep range, additions policy, no safety warnings]
+  - level: 5
+    prompt: >-
+      Write instructions for making one cup of hot black tea with a tea bag, using a
+      kettle and a mug. Output exactly a numbered list of 6 steps (digits followed by
+      a period), one sentence per step, no introduction or conclusion, no headings.
+      Step 1: fill the kettle with fresh water and boil it. Step 2: place the tea bag
+      in the mug. Step 3: pour the boiling water over the tea bag. Step 4: steep for
+      3 to 5 minutes. Step 5: remove and discard the tea bag. Step 6: say milk or
+      sugar may be added to taste. Keep each sentence under 20 words. No safety
+      warnings, no emojis.
+    dimensions_resolved: [content of each step, list punctuation, sentence length cap, no framing text]
