@@ -4,26 +4,19 @@
 
 ```mermaid
 flowchart LR
-    artifact["artifact<br/>&quot;Write a sorting function.&quot;"]
-    samples["20 completions<br/>(T = 1.0)"]
-    c1["Python, ascending<br/>9 samples"]
-    c2["Python, descending<br/>6 samples"]
-    c3["JavaScript<br/>4 samples"]
-    c4["asks clarifying question<br/>1 sample"]
-    ei["H = 1.19 nats<br/>EI ≈ 3.3 effective readings"]
+    prompt["&quot;Write a sorting function.&quot;"]
+    c1["Python, ascending"]
+    c2["Python, descending"]
+    c3["JavaScript"]
+    score["EI ≈ 3<br/>your prompt has 3 readings"]
 
-    artifact -->|"sample x20"| samples
-    samples -->|"cluster by meaning"| c1
-    samples --> c2
-    samples --> c3
-    samples --> c4
-    c1 --> ei
-    c2 --> ei
-    c3 --> ei
-    c4 --> ei
+    prompt -->|"ask the model 20 times"| c1
+    prompt --> c2
+    prompt --> c3
+    c1 --> score
+    c2 --> score
+    c3 --> score
 ```
-
-The same task written as a full behavioral spec collapses all 20 samples into one cluster: EI = 1.0.
 
 ## The idea
 
