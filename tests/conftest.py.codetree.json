@@ -1,0 +1,370 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "tests/conftest.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "from pathlib import Path\n",
+      "kind": "import",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nimport pytest\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "class",
+      "name": "StubClient",
+      "header_text": "\n\nclass StubClient:\n",
+      "span": {
+        "start_line": 4,
+        "end_line": 25
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0003",
+          "text": "    \"\"\"ModelClient stub: returns queued completions and fixed embeddings.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 7,
+            "end_line": 7
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0002",
+          "kind": "function",
+          "name": "__init__",
+          "header_text": "\n    def __init__(self, completions=None, embeddings=None):\n",
+          "span": {
+            "start_line": 8,
+            "end_line": 13
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0004",
+              "text": "        self.completions = list(completions or [])\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 10,
+                "end_line": 10
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0005",
+              "text": "        self.embeddings = dict(embeddings or {})\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 11,
+                "end_line": 11
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0006",
+              "text": "        self.complete_calls = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 12,
+                "end_line": 12
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0007",
+              "text": "        self.embed_calls = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 13,
+                "end_line": 13
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model, prompt, temperature, max_tokens, seed=None):\n",
+          "span": {
+            "start_line": 14,
+            "end_line": 21
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0008",
+              "text": "        self.complete_calls.append(\n            {\"model\": model, \"prompt\": prompt, \"temperature\": temperature, \"seed\": seed}\n        )\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 16,
+                "end_line": 18
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0009",
+              "text": "        if not self.completions:\n            raise AssertionError(\"StubClient ran out of queued completions\")\n",
+              "kind": "if",
+              "span": {
+                "start_line": 19,
+                "end_line": 20
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0010",
+              "text": "        return self.completions.pop(0)\n",
+              "kind": "return",
+              "span": {
+                "start_line": 21,
+                "end_line": 21
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model, text):\n",
+          "span": {
+            "start_line": 22,
+            "end_line": 25
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0011",
+              "text": "        self.embed_calls.append({\"model\": model, \"text\": text})\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 24,
+                "end_line": 24
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0012",
+              "text": "        return self.embeddings[text]\n",
+              "kind": "return",
+              "span": {
+                "start_line": 25,
+                "end_line": 25
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0005",
+      "kind": "function",
+      "name": "stub_client_factory",
+      "header_text": "\n\n@pytest.fixture\ndef stub_client_factory():\n",
+      "span": {
+        "start_line": 26,
+        "end_line": 30
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0013",
+          "text": "    return StubClient\n",
+          "kind": "return",
+          "span": {
+            "start_line": 30,
+            "end_line": 30
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0006",
+      "kind": "function",
+      "name": "tmp_cache_dir",
+      "header_text": "\n\n@pytest.fixture\ndef tmp_cache_dir(tmp_path) -> Path:\n",
+      "span": {
+        "start_line": 31,
+        "end_line": 35
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0014",
+          "text": "    return tmp_path / \"cache\"\n",
+          "kind": "return",
+          "span": {
+            "start_line": 35,
+            "end_line": 35
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

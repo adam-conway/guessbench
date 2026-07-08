@@ -1,0 +1,503 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "guessbench/sampling.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"Sampling stage: draw N independent completions, cached, with refusal flagging.\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom __future__ import annotations\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "\nimport re\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "from dataclasses import dataclass\n",
+      "kind": "import",
+      "span": {
+        "start_line": 6,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "\nfrom guessbench.cache import Cache, sample_key\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0006",
+      "text": "from guessbench.config import RunConfig\n",
+      "kind": "import",
+      "span": {
+        "start_line": 9,
+        "end_line": 9
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0007",
+      "text": "from guessbench.providers import ModelClient\n",
+      "kind": "import",
+      "span": {
+        "start_line": 10,
+        "end_line": 10
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0008",
+      "text": "\n# Heuristic refusal / meta-response detection (SPEC 9). Refusals still cluster\n# like any other sample; this only feeds the report's refusal fraction.\n_REFUSAL_PATTERNS = [\n    r\"\\bI (?:can'?not|can'?t|won'?t|am (?:not able|unable)) (?:to )?(?:help|assist|comply|do|write|provide|fulfill)\",\n    r\"\\bI'?m sorry,? (?:but )?I (?:can'?not|can'?t)\",\n    r\"\\bI must (?:decline|refuse)\\b\",\n    r\"\\bas an AI\\b.{0,60}\\b(?:can'?not|can'?t|unable)\\b\",\n]\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 11,
+        "end_line": 19
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0009",
+      "text": "_CLARIFICATION_PATTERNS = [\n    r\"\\b(?:could|can|would) you (?:please )?(?:clarify|specify|provide more|tell me more)\\b\",\n    r\"\\bbefore I (?:can )?(?:help|proceed|answer|start)\\b.{0,80}\\?\",\n    r\"\\b(?:what|which) (?:kind|type|sort) of\\b.{0,80}\\?\\s*$\",\n    r\"\\bI need (?:a bit )?more (?:information|details|context)\\b\",\n]\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 20,
+        "end_line": 25
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "is_refusal",
+      "header_text": "\n\ndef is_refusal(text: str) -> bool:\n",
+      "span": {
+        "start_line": 26,
+        "end_line": 35
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0010",
+          "text": "    \"\"\"True if the sample declines the task or asks a clarifying question instead\n    of completing it.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 29,
+            "end_line": 30
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0011",
+          "text": "    head = text.strip()[:500]\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 31,
+            "end_line": 31
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0012",
+          "text": "    for pattern in _REFUSAL_PATTERNS + _CLARIFICATION_PATTERNS:\n        if re.search(pattern, head, flags=re.IGNORECASE):\n            return True\n",
+          "kind": "for",
+          "span": {
+            "start_line": 32,
+            "end_line": 34
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0013",
+          "text": "    return False\n",
+          "kind": "return",
+          "span": {
+            "start_line": 35,
+            "end_line": 35
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "class",
+      "name": "SampleSet",
+      "header_text": "\n\n@dataclass\nclass SampleSet:\n",
+      "span": {
+        "start_line": 36,
+        "end_line": 52
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0014",
+          "text": "    \"\"\"N completions of one artifact plus refusal accounting.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 40,
+            "end_line": 40
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0015",
+          "text": "\n    artifact_text: str\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 41,
+            "end_line": 42
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0016",
+          "text": "    samples: list[str]\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 43,
+            "end_line": 43
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0017",
+          "text": "    refusal_flags: list[bool]\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 44,
+            "end_line": 44
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "refusal_fraction",
+          "header_text": "\n    @property\n    def refusal_fraction(self) -> float:\n",
+          "span": {
+            "start_line": 45,
+            "end_line": 48
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0018",
+              "text": "        return sum(self.refusal_flags) / len(self.samples) if self.samples else 0.0\n",
+              "kind": "return",
+              "span": {
+                "start_line": 48,
+                "end_line": 48
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "low_confidence",
+          "header_text": "\n    @property\n    def low_confidence(self) -> bool:\n",
+          "span": {
+            "start_line": 49,
+            "end_line": 52
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0019",
+              "text": "        return self.refusal_fraction > 0.20\n",
+              "kind": "return",
+              "span": {
+                "start_line": 52,
+                "end_line": 52
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0005",
+      "kind": "function",
+      "name": "draw_samples",
+      "header_text": "\n\ndef draw_samples(artifact_text: str, config: RunConfig, client: ModelClient, cache: Cache) -> SampleSet:\n",
+      "span": {
+        "start_line": 53,
+        "end_line": 93
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0020",
+          "text": "    \"\"\"Draw config.n_samples independent completions (SPEC 2.1), content-addressed\n    cached per (model, T, max_tokens, artifact, sample_index).\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 56,
+            "end_line": 57
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0021",
+          "text": "    samples: list[str] = []\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 58,
+            "end_line": 58
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0022",
+          "text": "    for i in range(config.n_samples):\n        # The run seed offsets the sample index so runs with disjoint seeds (T3)\n        # draw disjoint samples while keeping the spec-pinned cache key formula.\n        sample_index = config.seed * config.n_samples + i\n        key = sample_key(\n            config.reference_model, config.temperature, config.max_tokens, artifact_text, sample_index\n        )\n        cached = cache.get(\"samples\", key)\n        if cached is not None:\n            text = cached[\"text\"]\n        else:\n            text = client.complete(\n                model=config.reference_model,\n                prompt=artifact_text,\n                temperature=config.temperature,\n                max_tokens=config.max_tokens,\n                seed=sample_index,\n            )\n            cache.put(\n                \"samples\",\n                key,\n                {\n                    \"text\": text,\n                    \"reference_model\": config.reference_model,\n                    \"temperature\": config.temperature,\n                    \"max_tokens\": config.max_tokens,\n                    \"sample_index\": sample_index,\n                },\n            )\n        samples.append(text)\n",
+          "kind": "for",
+          "span": {
+            "start_line": 59,
+            "end_line": 88
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0023",
+          "text": "    return SampleSet(\n        artifact_text=artifact_text,\n        samples=samples,\n        refusal_flags=[is_refusal(s) for s in samples],\n    )\n",
+          "kind": "return",
+          "span": {
+            "start_line": 89,
+            "end_line": 93
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

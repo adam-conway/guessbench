@@ -1,0 +1,622 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "guessbench/scoring.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"Clusters -> entropy -> Effective Interpretations, with bootstrap CI (SPEC 2.2-2.3).\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom __future__ import annotations\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "\nfrom collections import Counter\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "from dataclasses import dataclass\n",
+      "kind": "import",
+      "span": {
+        "start_line": 6,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "\nimport numpy as np\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "entropy_nats",
+      "header_text": "\n\ndef entropy_nats(assignments: list[int]) -> float:\n",
+      "span": {
+        "start_line": 9,
+        "end_line": 18
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0006",
+          "text": "    \"\"\"Shannon entropy in nats over cluster proportions.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 12,
+            "end_line": 12
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0007",
+          "text": "    n = len(assignments)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 13,
+            "end_line": 13
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0008",
+          "text": "    if n == 0:\n        return 0.0\n",
+          "kind": "if",
+          "span": {
+            "start_line": 14,
+            "end_line": 15
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0009",
+          "text": "    counts = np.array(list(Counter(assignments).values()), dtype=float)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 16,
+            "end_line": 16
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0010",
+          "text": "    p = counts / n\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 17,
+            "end_line": 17
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0011",
+          "text": "    return float(-np.sum(p * np.log(p)))\n",
+          "kind": "return",
+          "span": {
+            "start_line": 18,
+            "end_line": 18
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "function",
+      "name": "effective_interpretations",
+      "header_text": "\n\ndef effective_interpretations(assignments: list[int]) -> float:\n",
+      "span": {
+        "start_line": 19,
+        "end_line": 23
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0012",
+          "text": "    \"\"\"EI = e^H. Range [1, N]: 1.0 when all samples share a cluster, N when all distinct.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 22,
+            "end_line": 22
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0013",
+          "text": "    return float(np.exp(entropy_nats(assignments)))\n",
+          "kind": "return",
+          "span": {
+            "start_line": 23,
+            "end_line": 23
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0003",
+      "kind": "class",
+      "name": "Score",
+      "header_text": "\n\n@dataclass\nclass Score:\n",
+      "span": {
+        "start_line": 24,
+        "end_line": 33
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0014",
+          "text": "    ei: float\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 28,
+            "end_line": 28
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0015",
+          "text": "    ei_ci_low: float\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 29,
+            "end_line": 29
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0016",
+          "text": "    ei_ci_high: float\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 30,
+            "end_line": 30
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0017",
+          "text": "    entropy: float\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 31,
+            "end_line": 31
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0018",
+          "text": "    k: int\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 32,
+            "end_line": 32
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0019",
+          "text": "    n: int\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 33,
+            "end_line": 33
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0004",
+      "kind": "function",
+      "name": "bootstrap_ci",
+      "header_text": "\n\ndef bootstrap_ci(assignments: list[int], iterations: int = 1000, seed: int = 0) -> tuple[float, float]:\n",
+      "span": {
+        "start_line": 34,
+        "end_line": 47
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0020",
+          "text": "    \"\"\"90% bootstrap CI on EI: resample cluster assignments with replacement,\n    recompute EI, take 5th/95th percentiles (SPEC 2.3).\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 37,
+            "end_line": 38
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0021",
+          "text": "    rng = np.random.default_rng(seed)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 39,
+            "end_line": 39
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0022",
+          "text": "    arr = np.array(assignments)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 40,
+            "end_line": 40
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0023",
+          "text": "    n = len(arr)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 41,
+            "end_line": 41
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0024",
+          "text": "    eis = np.empty(iterations)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 42,
+            "end_line": 42
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0025",
+          "text": "    for b in range(iterations):\n        resampled = arr[rng.integers(0, n, size=n)]\n        eis[b] = effective_interpretations(resampled.tolist())\n",
+          "kind": "for",
+          "span": {
+            "start_line": 43,
+            "end_line": 45
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0026",
+          "text": "    low, high = np.percentile(eis, [5, 95])\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 46,
+            "end_line": 46
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0027",
+          "text": "    return float(low), float(high)\n",
+          "kind": "return",
+          "span": {
+            "start_line": 47,
+            "end_line": 47
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0005",
+      "kind": "function",
+      "name": "score_assignments",
+      "header_text": "\n\ndef score_assignments(assignments: list[int], bootstrap_iterations: int = 1000, seed: int = 0) -> Score:\n",
+      "span": {
+        "start_line": 48,
+        "end_line": 60
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0028",
+          "text": "    h = entropy_nats(assignments)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 51,
+            "end_line": 51
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0029",
+          "text": "    ci_low, ci_high = bootstrap_ci(assignments, iterations=bootstrap_iterations, seed=seed)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 52,
+            "end_line": 52
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0030",
+          "text": "    return Score(\n        ei=float(np.exp(h)),\n        ei_ci_low=ci_low,\n        ei_ci_high=ci_high,\n        entropy=h,\n        k=len(set(assignments)),\n        n=len(assignments),\n    )\n",
+          "kind": "return",
+          "span": {
+            "start_line": 53,
+            "end_line": 60
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

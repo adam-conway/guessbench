@@ -1,0 +1,779 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "guessbench/providers.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"Model clients: a minimal protocol plus Ollama and Anthropic implementations.\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom __future__ import annotations\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "\nimport os\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "from typing import Protocol\n",
+      "kind": "import",
+      "span": {
+        "start_line": 6,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "\nimport httpx\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "class",
+      "name": "ModelClient",
+      "header_text": "\n\nclass ModelClient(Protocol):\n",
+      "span": {
+        "start_line": 9,
+        "end_line": 20
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0006",
+          "text": "    \"\"\"Interface every provider implements; tests use stubs of this.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 12,
+            "end_line": 12
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0002",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model: str, prompt: str, temperature: float, max_tokens: int, seed: int | None = None) -> str:\n",
+          "span": {
+            "start_line": 13,
+            "end_line": 16
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0007",
+              "text": "        \"\"\"Return one completion for a single-turn user prompt.\"\"\"\n",
+              "kind": "docstring",
+              "span": {
+                "start_line": 15,
+                "end_line": 15
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0008",
+              "text": "        ...\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 16,
+                "end_line": 16
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model: str, text: str) -> list[float]:\n",
+          "span": {
+            "start_line": 17,
+            "end_line": 20
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0009",
+              "text": "        \"\"\"Return an embedding vector for the text.\"\"\"\n",
+              "kind": "docstring",
+              "span": {
+                "start_line": 19,
+                "end_line": 19
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0010",
+              "text": "        ...\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 20,
+                "end_line": 20
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0004",
+      "kind": "class",
+      "name": "OllamaClient",
+      "header_text": "\n\nclass OllamaClient:\n",
+      "span": {
+        "start_line": 21,
+        "end_line": 52
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0011",
+          "text": "    \"\"\"Client for a local Ollama server.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 24,
+            "end_line": 24
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0005",
+          "kind": "function",
+          "name": "__init__",
+          "header_text": "\n    def __init__(self, base_url: str = \"http://localhost:11434\", timeout: float = 300.0) -> None:\n",
+          "span": {
+            "start_line": 25,
+            "end_line": 28
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0012",
+              "text": "        self.base_url = base_url.rstrip(\"/\")\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 27,
+                "end_line": 27
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0013",
+              "text": "        self._http = httpx.Client(timeout=timeout)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 28,
+                "end_line": 28
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0006",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model: str, prompt: str, temperature: float, max_tokens: int, seed: int | None = None) -> str:\n",
+          "span": {
+            "start_line": 29,
+            "end_line": 44
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0014",
+              "text": "        options: dict = {\"temperature\": temperature, \"num_predict\": max_tokens}\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 31,
+                "end_line": 31
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0015",
+              "text": "        if seed is not None:\n            options[\"seed\"] = seed\n",
+              "kind": "if",
+              "span": {
+                "start_line": 32,
+                "end_line": 33
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0016",
+              "text": "        resp = self._http.post(\n            f\"{self.base_url}/api/chat\",\n            json={\n                \"model\": model,\n                \"messages\": [{\"role\": \"user\", \"content\": prompt}],\n                \"stream\": False,\n                \"options\": options,\n            },\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 34,
+                "end_line": 42
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0017",
+              "text": "        resp.raise_for_status()\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 43,
+                "end_line": 43
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0018",
+              "text": "        return resp.json()[\"message\"][\"content\"]\n",
+              "kind": "return",
+              "span": {
+                "start_line": 44,
+                "end_line": 44
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0007",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model: str, text: str) -> list[float]:\n",
+          "span": {
+            "start_line": 45,
+            "end_line": 52
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0019",
+              "text": "        resp = self._http.post(\n            f\"{self.base_url}/api/embed\",\n            json={\"model\": model, \"input\": text},\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 47,
+                "end_line": 50
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0020",
+              "text": "        resp.raise_for_status()\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 51,
+                "end_line": 51
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0021",
+              "text": "        return resp.json()[\"embeddings\"][0]\n",
+              "kind": "return",
+              "span": {
+                "start_line": 52,
+                "end_line": 52
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0008",
+      "kind": "class",
+      "name": "AnthropicClient",
+      "header_text": "\n\nclass AnthropicClient:\n",
+      "span": {
+        "start_line": 53,
+        "end_line": 82
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0022",
+          "text": "    \"\"\"Client for the Anthropic Messages API (completions only; Anthropic has no\n    embeddings endpoint, so pair with Ollama or another provider for Strategy B).\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 56,
+            "end_line": 57
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0009",
+          "kind": "function",
+          "name": "__init__",
+          "header_text": "\n    def __init__(self, api_key: str | None = None, timeout: float = 300.0) -> None:\n",
+          "span": {
+            "start_line": 58,
+            "end_line": 61
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0023",
+              "text": "        self.api_key = api_key or os.environ.get(\"ANTHROPIC_API_KEY\", \"\")\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 60,
+                "end_line": 60
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0024",
+              "text": "        self._http = httpx.Client(timeout=timeout)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 61,
+                "end_line": 61
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0010",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model: str, prompt: str, temperature: float, max_tokens: int, seed: int | None = None) -> str:\n        # The Messages API has no seed parameter; independence comes from sampling.\n",
+          "span": {
+            "start_line": 62,
+            "end_line": 79
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0025",
+              "text": "        resp = self._http.post(\n            \"https://api.anthropic.com/v1/messages\",\n            headers={\n                \"x-api-key\": self.api_key,\n                \"anthropic-version\": \"2023-06-01\",\n            },\n            json={\n                \"model\": model,\n                \"max_tokens\": max_tokens,\n                \"temperature\": temperature,\n                \"messages\": [{\"role\": \"user\", \"content\": prompt}],\n            },\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 65,
+                "end_line": 77
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0026",
+              "text": "        resp.raise_for_status()\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 78,
+                "end_line": 78
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0027",
+              "text": "        return \"\".join(block[\"text\"] for block in resp.json()[\"content\"] if block[\"type\"] == \"text\")\n",
+              "kind": "return",
+              "span": {
+                "start_line": 79,
+                "end_line": 79
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0011",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model: str, text: str) -> list[float]:\n",
+          "span": {
+            "start_line": 80,
+            "end_line": 82
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0028",
+              "text": "        raise NotImplementedError(\"Anthropic does not provide an embeddings API\")\n",
+              "kind": "raise",
+              "span": {
+                "start_line": 82,
+                "end_line": 82
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0012",
+      "kind": "function",
+      "name": "make_client",
+      "header_text": "\n\ndef make_client(provider: str, ollama_base_url: str = \"http://localhost:11434\") -> ModelClient:\n",
+      "span": {
+        "start_line": 83,
+        "end_line": 90
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0029",
+          "text": "    if provider == \"ollama\":\n        return OllamaClient(base_url=ollama_base_url)\n",
+          "kind": "if",
+          "span": {
+            "start_line": 86,
+            "end_line": 87
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0030",
+          "text": "    if provider == \"anthropic\":\n        return AnthropicClient()\n",
+          "kind": "if",
+          "span": {
+            "start_line": 88,
+            "end_line": 89
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0031",
+          "text": "    raise ValueError(f\"Unknown provider: {provider!r}\")\n",
+          "kind": "raise",
+          "span": {
+            "start_line": 90,
+            "end_line": 90
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

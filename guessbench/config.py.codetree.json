@@ -1,0 +1,860 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "guessbench/config.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"Run configuration and content hashing.\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom __future__ import annotations\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "\nimport hashlib\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "import json\n",
+      "kind": "import",
+      "span": {
+        "start_line": 6,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "from dataclasses import asdict, dataclass, field\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 7
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0006",
+      "text": "from pathlib import Path\n",
+      "kind": "import",
+      "span": {
+        "start_line": 8,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0007",
+      "text": "\n# Spec-pinned sampling defaults (SPEC 2.1).\nDEFAULT_N = 20\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 9,
+        "end_line": 11
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0008",
+      "text": "DEFAULT_TEMPERATURE = 1.0\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 12,
+        "end_line": 12
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0009",
+      "text": "DEFAULT_MAX_TOKENS = 800\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 13,
+        "end_line": 13
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0010",
+      "text": "\n# Model defaults target local Ollama per user request (spec default is\n# claude-sonnet-4-6 via Anthropic; see DECISIONS.md). Spec pins judge != reference.\nDEFAULT_PROVIDER = \"ollama\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 14,
+        "end_line": 17
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0011",
+      "text": "DEFAULT_REFERENCE_MODEL = \"llama3.1:8b\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 18,
+        "end_line": 18
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0012",
+      "text": "DEFAULT_JUDGE_MODEL = \"qwen3:8b\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 19,
+        "end_line": 19
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0013",
+      "text": "DEFAULT_EMBEDDING_MODEL = \"nomic-embed-text\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 20,
+        "end_line": 20
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0014",
+      "text": "\nJUDGE_PROMPT_VERSION = \"v1\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 21,
+        "end_line": 22
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "stable_hash",
+      "header_text": "\n\ndef stable_hash(*parts: object) -> str:\n",
+      "span": {
+        "start_line": 23,
+        "end_line": 28
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0015",
+          "text": "    \"\"\"SHA-256 over a JSON-serialized tuple of parts, hex digest.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 26,
+            "end_line": 26
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0016",
+          "text": "    payload = json.dumps(parts, sort_keys=True, ensure_ascii=False, default=str)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 27,
+            "end_line": 27
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0017",
+          "text": "    return hashlib.sha256(payload.encode(\"utf-8\")).hexdigest()\n",
+          "kind": "return",
+          "span": {
+            "start_line": 28,
+            "end_line": 28
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "class",
+      "name": "RunConfig",
+      "header_text": "\n\n@dataclass\nclass RunConfig:\n",
+      "span": {
+        "start_line": 29,
+        "end_line": 72
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0018",
+          "text": "    \"\"\"Full configuration for a scoring run. Every field is recorded in reports.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 33,
+            "end_line": 33
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0019",
+          "text": "\n    reference_model: str = DEFAULT_REFERENCE_MODEL\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 34,
+            "end_line": 35
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0020",
+          "text": "    judge_model: str = DEFAULT_JUDGE_MODEL\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 36,
+            "end_line": 36
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0021",
+          "text": "    embedding_model: str = DEFAULT_EMBEDDING_MODEL\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 37,
+            "end_line": 37
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0022",
+          "text": "    provider: str = DEFAULT_PROVIDER\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 38,
+            "end_line": 38
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0023",
+          "text": "    n_samples: int = DEFAULT_N\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 39,
+            "end_line": 39
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0024",
+          "text": "    temperature: float = DEFAULT_TEMPERATURE\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 40,
+            "end_line": 40
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0025",
+          "text": "    max_tokens: int = DEFAULT_MAX_TOKENS\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 41,
+            "end_line": 41
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0026",
+          "text": "    strategy: str = \"llm_judge\"\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 42,
+            "end_line": 42
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0027",
+          "text": "    embedding_threshold: float = 0.35\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 43,
+            "end_line": 43
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0028",
+          "text": "    seed: int = 0\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 44,
+            "end_line": 44
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0029",
+          "text": "    judge_prompt_version: str = JUDGE_PROMPT_VERSION\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 45,
+            "end_line": 45
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0030",
+          "text": "    bootstrap_iterations: int = 1000\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 46,
+            "end_line": 46
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0031",
+          "text": "    cache_dir: Path = field(default_factory=lambda: Path(\"cache\"))\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 47,
+            "end_line": 47
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0032",
+          "text": "    use_cache: bool = True\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 48,
+            "end_line": 48
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0033",
+          "text": "    ollama_base_url: str = \"http://localhost:11434\"\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 49,
+            "end_line": 49
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "__post_init__",
+          "header_text": "\n    def __post_init__(self) -> None:\n",
+          "span": {
+            "start_line": 50,
+            "end_line": 57
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0034",
+              "text": "        if self.judge_model == self.reference_model:\n            raise ValueError(\n                \"judge_model must differ from reference_model (SPEC 4.2: \"\n                \"self-judging invites self-preference artifacts)\"\n            )\n",
+              "kind": "if",
+              "span": {
+                "start_line": 52,
+                "end_line": 56
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0035",
+              "text": "        self.cache_dir = Path(self.cache_dir)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 57,
+                "end_line": 57
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "config_hash",
+          "header_text": "\n    def config_hash(self) -> str:\n",
+          "span": {
+            "start_line": 58,
+            "end_line": 65
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0036",
+              "text": "        \"\"\"Reproducibility hash over the score-affecting configuration.\"\"\"\n",
+              "kind": "docstring",
+              "span": {
+                "start_line": 60,
+                "end_line": 60
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0037",
+              "text": "        d = asdict(self)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 61,
+                "end_line": 61
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0038",
+              "text": "        # Cache location/usage and endpoint do not affect the score itself.\n        for key in (\"cache_dir\", \"use_cache\", \"ollama_base_url\"):\n            d.pop(key)\n",
+              "kind": "for",
+              "span": {
+                "start_line": 62,
+                "end_line": 64
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0039",
+              "text": "        return stable_hash(d)[:16]\n",
+              "kind": "return",
+              "span": {
+                "start_line": 65,
+                "end_line": 65
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0005",
+          "kind": "function",
+          "name": "to_record",
+          "header_text": "\n    def to_record(self) -> dict:\n",
+          "span": {
+            "start_line": 66,
+            "end_line": 72
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0040",
+              "text": "        \"\"\"JSON-safe dict of the full config for report embedding.\"\"\"\n",
+              "kind": "docstring",
+              "span": {
+                "start_line": 68,
+                "end_line": 68
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0041",
+              "text": "        d = asdict(self)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 69,
+                "end_line": 69
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0042",
+              "text": "        d[\"cache_dir\"] = str(d[\"cache_dir\"])\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 70,
+                "end_line": 70
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0043",
+              "text": "        d[\"config_hash\"] = self.config_hash()\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 71,
+                "end_line": 71
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0044",
+              "text": "        return d\n",
+              "kind": "return",
+              "span": {
+                "start_line": 72,
+                "end_line": 72
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

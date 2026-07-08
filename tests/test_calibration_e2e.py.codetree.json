@@ -1,0 +1,1451 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "tests/test_calibration_e2e.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:48Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"End-to-end calibration test against a simulated model with controlled ambiguity.\n\nThe simulated reference model emits samples tagged with a meaning id; the number\nof distinct meanings per artifact is chosen so a correct pipeline passes T1-T4.\nThe simulated judge and embedder both key off the meaning tag.\n\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nimport json\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "import re\n",
+      "kind": "import",
+      "span": {
+        "start_line": 9,
+        "end_line": 9
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "\nimport numpy as np\n",
+      "kind": "import",
+      "span": {
+        "start_line": 10,
+        "end_line": 11
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "import pytest\n",
+      "kind": "import",
+      "span": {
+        "start_line": 12,
+        "end_line": 12
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0006",
+      "text": "\nfrom guessbench import cli\n",
+      "kind": "import",
+      "span": {
+        "start_line": 13,
+        "end_line": 14
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0007",
+      "text": "from guessbench.acceptance import calibration_artifacts, run_calibration\n",
+      "kind": "import",
+      "span": {
+        "start_line": 15,
+        "end_line": 15
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0008",
+      "text": "from guessbench.cache import Cache\n",
+      "kind": "import",
+      "span": {
+        "start_line": 16,
+        "end_line": 16
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0009",
+      "text": "from guessbench.config import RunConfig\n",
+      "kind": "import",
+      "span": {
+        "start_line": 17,
+        "end_line": 17
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0010",
+      "text": "\nMEANING_RE = re.compile(r\"meaning-(\\d+)\")\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 18,
+        "end_line": 19
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0011",
+      "text": "\nN_MEANINGS_BY_ARTIFACT = {\n    \"A1\": 1,\n    \"A2\": 1,\n    \"A3\": 2,\n    \"A4\": 10,\n    \"L1\": 6,\n    \"L2\": 4,\n    \"L3\": 3,\n    \"L4\": 2,\n    \"L5\": 1,\n}\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 20,
+        "end_line": 31
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "n_meanings_for",
+      "header_text": "\n\ndef n_meanings_for(artifact_id: str) -> int:\n",
+      "span": {
+        "start_line": 32,
+        "end_line": 37
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0012",
+          "text": "    if artifact_id in N_MEANINGS_BY_ARTIFACT:\n        return N_MEANINGS_BY_ARTIFACT[artifact_id]\n",
+          "kind": "if",
+          "span": {
+            "start_line": 35,
+            "end_line": 36
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0013",
+          "text": "    return N_MEANINGS_BY_ARTIFACT[artifact_id.split(\":\")[1]]\n",
+          "kind": "return",
+          "span": {
+            "start_line": 37,
+            "end_line": 37
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "class",
+      "name": "SimulatedModel",
+      "header_text": "\n\nclass SimulatedModel:\n",
+      "span": {
+        "start_line": 38,
+        "end_line": 63
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0014",
+          "text": "    \"\"\"Plays reference model, judge, and embedder for calibration artifacts.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 41,
+            "end_line": 41
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "__init__",
+          "header_text": "\n    def __init__(self):\n",
+          "span": {
+            "start_line": 42,
+            "end_line": 44
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0015",
+              "text": "        self.text_to_id = {text: aid for aid, text in calibration_artifacts().items()}\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 44,
+                "end_line": 44
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model, prompt, temperature, max_tokens, seed=None):\n",
+          "span": {
+            "start_line": 45,
+            "end_line": 55
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0016",
+              "text": "        if \"VERDICT\" in prompt:\n            a = MEANING_RE.search(prompt.split(\"<output_A>\")[1].split(\"</output_A>\")[0])\n            b = MEANING_RE.search(prompt.split(\"<output_B>\")[1].split(\"</output_B>\")[0])\n            if a.group(1) == b.group(1):\n                return \"VERDICT: INTERCHANGEABLE\"\n            return \"VERDICT: DIFFERENT\\nDIMENSION: simulated meaning\"\n",
+              "kind": "if",
+              "span": {
+                "start_line": 47,
+                "end_line": 52
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0017",
+              "text": "        artifact_id = self.text_to_id[prompt]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 53,
+                "end_line": 53
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0018",
+              "text": "        meaning = seed % n_meanings_for(artifact_id)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 54,
+                "end_line": 54
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0019",
+              "text": "        return f\"meaning-{meaning} wording-{seed}\"\n",
+              "kind": "return",
+              "span": {
+                "start_line": 55,
+                "end_line": 55
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0005",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model, text):\n",
+          "span": {
+            "start_line": 56,
+            "end_line": 63
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0020",
+              "text": "        match = re.match(r\"meaning-(\\d+) wording-(\\d+)\", text)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 58,
+                "end_line": 58
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0021",
+              "text": "        meaning, wording = int(match.group(1)), int(match.group(2))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 59,
+                "end_line": 59
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0022",
+              "text": "        vec = np.zeros(12)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 60,
+                "end_line": 60
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0023",
+              "text": "        vec[meaning] = 1.0\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 61,
+                "end_line": 61
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0024",
+              "text": "        vec[11] = 0.02 * (wording % 5)  # wording jitter within a meaning\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 62,
+                "end_line": 62
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0025",
+              "text": "        return vec.tolist()\n",
+              "kind": "return",
+              "span": {
+                "start_line": 63,
+                "end_line": 63
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0006",
+      "kind": "function",
+      "name": "calibration_result",
+      "header_text": "\n\n@pytest.fixture(scope=\"module\")\ndef calibration_result(tmp_path_factory):\n",
+      "span": {
+        "start_line": 64,
+        "end_line": 70
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0026",
+          "text": "    cache = Cache(tmp_path_factory.mktemp(\"cache\"))\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 68,
+            "end_line": 68
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0027",
+          "text": "    config = RunConfig(cache_dir=\"unused\", bootstrap_iterations=200)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 69,
+            "end_line": 69
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0028",
+          "text": "    return run_calibration(config, SimulatedModel(), cache)\n",
+          "kind": "return",
+          "span": {
+            "start_line": 70,
+            "end_line": 70
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0007",
+      "kind": "class",
+      "name": "TestCalibrationEndToEnd",
+      "header_text": "\n\nclass TestCalibrationEndToEnd:\n",
+      "span": {
+        "start_line": 71,
+        "end_line": 91
+      },
+      "body": [
+        {
+          "type": "scope",
+          "id": "sc-0008",
+          "kind": "function",
+          "name": "test_both_strategies_pass_t1_to_t4",
+          "header_text": "    def test_both_strategies_pass_t1_to_t4(self, calibration_result):\n",
+          "span": {
+            "start_line": 74,
+            "end_line": 77
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0029",
+              "text": "        for strategy, results in calibration_result[\"results_by_strategy\"].items():\n            for result in results:\n                assert result.passed, f\"{strategy} {result.test_id}: {result.detail}\"\n",
+              "kind": "for",
+              "span": {
+                "start_line": 75,
+                "end_line": 77
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0009",
+          "kind": "function",
+          "name": "test_threshold_selected_by_sweep",
+          "header_text": "\n    def test_threshold_selected_by_sweep(self, calibration_result):\n",
+          "span": {
+            "start_line": 78,
+            "end_line": 82
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0030",
+              "text": "        assert calibration_result[\"selected_embedding_threshold\"] is not None\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 80,
+                "end_line": 80
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0031",
+              "text": "        sweep = calibration_result[\"threshold_sweep\"]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 81,
+                "end_line": 81
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0032",
+              "text": "        assert sweep[calibration_result[\"selected_embedding_threshold\"]][\"passes\"] == 3\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 82,
+                "end_line": 82
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0010",
+          "kind": "function",
+          "name": "test_reports_cover_all_artifacts",
+          "header_text": "\n    def test_reports_cover_all_artifacts(self, calibration_result):\n",
+          "span": {
+            "start_line": 83,
+            "end_line": 86
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0033",
+              "text": "        for reports in calibration_result[\"reports_by_strategy\"].values():\n            assert len(reports) == 29\n",
+              "kind": "for",
+              "span": {
+                "start_line": 85,
+                "end_line": 86
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0011",
+          "kind": "function",
+          "name": "test_table_renders",
+          "header_text": "\n    def test_table_renders(self, calibration_result):\n",
+          "span": {
+            "start_line": 87,
+            "end_line": 91
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0034",
+              "text": "        table = calibration_result[\"table\"]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 89,
+                "end_line": 89
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0035",
+              "text": "        assert \"llm_judge\" in table and \"embedding\" in table\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 90,
+                "end_line": 90
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0036",
+              "text": "        assert \"FAIL\" not in table.splitlines()[1]\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 91,
+                "end_line": 91
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0012",
+      "kind": "class",
+      "name": "TestCliScore",
+      "header_text": "\n\nclass TestCliScore(object):\n",
+      "span": {
+        "start_line": 92,
+        "end_line": 162
+      },
+      "body": [
+        {
+          "type": "scope",
+          "id": "sc-0013",
+          "kind": "function",
+          "name": "test_score_command",
+          "header_text": "    def test_score_command(self, tmp_path, monkeypatch, capsys):\n",
+          "span": {
+            "start_line": 95,
+            "end_line": 117
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0037",
+              "text": "        monkeypatch.setattr(cli, \"make_client\", lambda *a, **k: SimulatedModel())\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 96,
+                "end_line": 96
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0038",
+              "text": "        artifact = tmp_path / \"artifact.txt\"\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 97,
+                "end_line": 97
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0039",
+              "text": "        # A real calibration prompt so the simulated model recognizes it.\n        artifact.write_text(\"Choose either 'heads' or 'tails'. Reply with just your choice.\")\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 98,
+                "end_line": 99
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0040",
+              "text": "\n        rc = cli.main(\n            [\n                \"score\",\n                str(artifact),\n                \"--cache-dir\",\n                str(tmp_path / \"cache\"),\n                \"--out-dir\",\n                str(tmp_path / \"runs\"),\n            ]\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 100,
+                "end_line": 110
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0041",
+              "text": "        assert rc == 0\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 111,
+                "end_line": 111
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0042",
+              "text": "        out = capsys.readouterr().out\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 112,
+                "end_line": 112
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0043",
+              "text": "        assert \"EI@{model=llama3.1:8b\" in out\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 113,
+                "end_line": 113
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0044",
+              "text": "        report_files = list((tmp_path / \"runs\").glob(\"score_*.json\"))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 114,
+                "end_line": 114
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0045",
+              "text": "        assert len(report_files) == 1\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 115,
+                "end_line": 115
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0046",
+              "text": "        report = json.loads(report_files[0].read_text())\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 116,
+                "end_line": 116
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0047",
+              "text": "        assert report[\"k\"] == 2\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 117,
+                "end_line": 117
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0014",
+          "kind": "function",
+          "name": "test_calibrate_command",
+          "header_text": "\n    def test_calibrate_command(self, tmp_path, monkeypatch, capsys):\n",
+          "span": {
+            "start_line": 118,
+            "end_line": 133
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0048",
+              "text": "        monkeypatch.setattr(cli, \"make_client\", lambda *a, **k: SimulatedModel())\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 120,
+                "end_line": 120
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0049",
+              "text": "        rc = cli.main(\n            [\n                \"calibrate\",\n                \"--cache-dir\",\n                str(tmp_path / \"cache\"),\n                \"--out-dir\",\n                str(tmp_path / \"runs\"),\n            ]\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 121,
+                "end_line": 129
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0050",
+              "text": "        assert rc == 0\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 130,
+                "end_line": 130
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0051",
+              "text": "        out = capsys.readouterr().out\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 131,
+                "end_line": 131
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0052",
+              "text": "        assert \"PENDING_REVIEW\" in out\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 132,
+                "end_line": 132
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0053",
+              "text": "        assert (tmp_path / \"runs\" / \"calibration.json\").exists()\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 133,
+                "end_line": 133
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0015",
+          "kind": "function",
+          "name": "test_judge_audit_export_and_kappa",
+          "header_text": "\n    def test_judge_audit_export_and_kappa(self, tmp_path, monkeypatch, capsys):\n",
+          "span": {
+            "start_line": 134,
+            "end_line": 162
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0054",
+              "text": "        monkeypatch.setattr(cli, \"make_client\", lambda *a, **k: SimulatedModel())\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 136,
+                "end_line": 136
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0055",
+              "text": "        out_dir = tmp_path / \"audit\"\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 137,
+                "end_line": 137
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0056",
+              "text": "        rc = cli.main(\n            [\n                \"judge-audit\",\n                \"--cache-dir\",\n                str(tmp_path / \"cache\"),\n                \"--out-dir\",\n                str(out_dir),\n            ]\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 138,
+                "end_line": 146
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0057",
+              "text": "        assert rc == 0\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 147,
+                "end_line": 147
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0058",
+              "text": "        sheet_path = out_dir / \"t5_labeling_sheet.json\"\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 148,
+                "end_line": 148
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0059",
+              "text": "        key_path = out_dir / \"t5_answer_key.json\"\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 149,
+                "end_line": 149
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0060",
+              "text": "        assert sheet_path.exists() and key_path.exists()\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 150,
+                "end_line": 150
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0061",
+              "text": "\n        # A perfectly agreeing human labeler -> kappa 1.0, exit 0.\n        sheet = json.loads(sheet_path.read_text())\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 151,
+                "end_line": 153
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0062",
+              "text": "        key = {r[\"pair_id\"]: r[\"strategy_verdict\"] for r in json.loads(key_path.read_text())}\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 154,
+                "end_line": 154
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0063",
+              "text": "        for row in sheet:\n            row[\"human_label\"] = key[row[\"pair_id\"]]\n",
+              "kind": "for",
+              "span": {
+                "start_line": 155,
+                "end_line": 156
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0064",
+              "text": "        sheet_path.write_text(json.dumps(sheet))\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 157,
+                "end_line": 157
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0065",
+              "text": "        rc = cli.main(\n            [\"judge-audit\", \"--labeled-file\", str(sheet_path), \"--answer-key\", str(key_path)]\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 158,
+                "end_line": 160
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0066",
+              "text": "        assert rc == 0\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 161,
+                "end_line": 161
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0067",
+              "text": "        assert \"PASS\" in capsys.readouterr().out\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 162,
+                "end_line": 162
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

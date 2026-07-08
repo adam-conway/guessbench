@@ -1,0 +1,31 @@
+{
+  "format": "codetree/branch-manifest-v1",
+  "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+  "source_branch": "main",
+  "generated_at": "2026-07-08T07:12:48Z",
+  "files": {
+    "guessbench/__init__.py": "guessbench/__init__.py.codetree.json",
+    "guessbench/acceptance.py": "guessbench/acceptance.py.codetree.json",
+    "guessbench/cache.py": "guessbench/cache.py.codetree.json",
+    "guessbench/cli.py": "guessbench/cli.py.codetree.json",
+    "guessbench/config.py": "guessbench/config.py.codetree.json",
+    "guessbench/judge_audit.py": "guessbench/judge_audit.py.codetree.json",
+    "guessbench/providers.py": "guessbench/providers.py.codetree.json",
+    "guessbench/report.py": "guessbench/report.py.codetree.json",
+    "guessbench/sampling.py": "guessbench/sampling.py.codetree.json",
+    "guessbench/scoring.py": "guessbench/scoring.py.codetree.json",
+    "guessbench/strategies/__init__.py": "guessbench/strategies/__init__.py.codetree.json",
+    "guessbench/strategies/base.py": "guessbench/strategies/base.py.codetree.json",
+    "guessbench/strategies/embedding.py": "guessbench/strategies/embedding.py.codetree.json",
+    "guessbench/strategies/llm_judge.py": "guessbench/strategies/llm_judge.py.codetree.json",
+    "tests/conftest.py": "tests/conftest.py.codetree.json",
+    "tests/test_acceptance.py": "tests/test_acceptance.py.codetree.json",
+    "tests/test_cache_and_sampling.py": "tests/test_cache_and_sampling.py.codetree.json",
+    "tests/test_calibration_e2e.py": "tests/test_calibration_e2e.py.codetree.json",
+    "tests/test_embedding_strategy.py": "tests/test_embedding_strategy.py.codetree.json",
+    "tests/test_judge_audit.py": "tests/test_judge_audit.py.codetree.json",
+    "tests/test_llm_judge.py": "tests/test_llm_judge.py.codetree.json",
+    "tests/test_report.py": "tests/test_report.py.codetree.json",
+    "tests/test_scoring.py": "tests/test_scoring.py.codetree.json"
+  }
+}

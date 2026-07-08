@@ -1,0 +1,1486 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "tests/test_llm_judge.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:48Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "import pytest\n",
+      "kind": "import",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom guessbench.cache import Cache\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "from guessbench.config import RunConfig\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 4
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "from guessbench.strategies.llm_judge import LLMJudgeStrategy, parse_judge_response\n",
+      "kind": "import",
+      "span": {
+        "start_line": 5,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "make_config",
+      "header_text": "\n\ndef make_config(**overrides):\n",
+      "span": {
+        "start_line": 6,
+        "end_line": 11
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0005",
+          "text": "    defaults = dict(n_samples=4, cache_dir=\"unused\")\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 9,
+            "end_line": 9
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0006",
+          "text": "    defaults.update(overrides)\n",
+          "kind": "expr",
+          "span": {
+            "start_line": 10,
+            "end_line": 10
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0007",
+          "text": "    return RunConfig(**defaults)\n",
+          "kind": "return",
+          "span": {
+            "start_line": 11,
+            "end_line": 11
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "class",
+      "name": "VerdictClient",
+      "header_text": "\n\nclass VerdictClient:\n",
+      "span": {
+        "start_line": 12,
+        "end_line": 31
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0008",
+          "text": "    \"\"\"Judge stub with a fixed verdict function over (text_a, text_b) pairs.\"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 15,
+            "end_line": 15
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "__init__",
+          "header_text": "\n    def __init__(self, verdict_fn):\n",
+          "span": {
+            "start_line": 16,
+            "end_line": 19
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0009",
+              "text": "        self.verdict_fn = verdict_fn\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 18,
+                "end_line": 18
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0010",
+              "text": "        self.calls = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 19,
+                "end_line": 19
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "complete",
+          "header_text": "\n    def complete(self, model, prompt, temperature, max_tokens, seed=None):\n",
+          "span": {
+            "start_line": 20,
+            "end_line": 28
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0011",
+              "text": "        self.calls.append(prompt)\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 22,
+                "end_line": 22
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0012",
+              "text": "        a = prompt.split(\"<output_A>\\n\")[1].split(\"\\n</output_A>\")[0]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 23,
+                "end_line": 23
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0013",
+              "text": "        b = prompt.split(\"<output_B>\\n\")[1].split(\"\\n</output_B>\")[0]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 24,
+                "end_line": 24
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0014",
+              "text": "        verdict, label = self.verdict_fn(a, b)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 25,
+                "end_line": 25
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0015",
+              "text": "        if verdict == \"INTERCHANGEABLE\":\n            return \"VERDICT: INTERCHANGEABLE\"\n",
+              "kind": "if",
+              "span": {
+                "start_line": 26,
+                "end_line": 27
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0016",
+              "text": "        return f\"VERDICT: DIFFERENT\\nDIMENSION: {label}\"\n",
+              "kind": "return",
+              "span": {
+                "start_line": 28,
+                "end_line": 28
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0005",
+          "kind": "function",
+          "name": "embed",
+          "header_text": "\n    def embed(self, model, text):\n",
+          "span": {
+            "start_line": 29,
+            "end_line": 31
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0017",
+              "text": "        raise NotImplementedError\n",
+              "kind": "raise",
+              "span": {
+                "start_line": 31,
+                "end_line": 31
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0006",
+      "kind": "class",
+      "name": "TestParseJudgeResponse",
+      "header_text": "\n\nclass TestParseJudgeResponse:\n",
+      "span": {
+        "start_line": 32,
+        "end_line": 52
+      },
+      "body": [
+        {
+          "type": "scope",
+          "id": "sc-0007",
+          "kind": "function",
+          "name": "test_interchangeable",
+          "header_text": "    def test_interchangeable(self):\n",
+          "span": {
+            "start_line": 35,
+            "end_line": 36
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0018",
+              "text": "        assert parse_judge_response(\"VERDICT: INTERCHANGEABLE\") == (\"INTERCHANGEABLE\", None)\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 36,
+                "end_line": 36
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0008",
+          "kind": "function",
+          "name": "test_different_with_label",
+          "header_text": "\n    def test_different_with_label(self):\n",
+          "span": {
+            "start_line": 37,
+            "end_line": 41
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0019",
+              "text": "        verdict, label = parse_judge_response(\"VERDICT: DIFFERENT\\nDIMENSION: sort direction.\")\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 39,
+                "end_line": 39
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0020",
+              "text": "        assert verdict == \"DIFFERENT\"\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 40,
+                "end_line": 40
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0021",
+              "text": "        assert label == \"sort direction\"\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 41,
+                "end_line": 41
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0009",
+          "kind": "function",
+          "name": "test_different_without_label_gets_placeholder",
+          "header_text": "\n    def test_different_without_label_gets_placeholder(self):\n",
+          "span": {
+            "start_line": 42,
+            "end_line": 44
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0022",
+              "text": "        assert parse_judge_response(\"VERDICT: DIFFERENT\") == (\"DIFFERENT\", \"unlabeled\")\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 44,
+                "end_line": 44
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0010",
+          "kind": "function",
+          "name": "test_strips_think_blocks",
+          "header_text": "\n    def test_strips_think_blocks(self):\n",
+          "span": {
+            "start_line": 45,
+            "end_line": 48
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0023",
+              "text": "        raw = \"<think>VERDICT: DIFFERENT hmm no wait</think>VERDICT: INTERCHANGEABLE\"\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 47,
+                "end_line": 47
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0024",
+              "text": "        assert parse_judge_response(raw) == (\"INTERCHANGEABLE\", None)\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 48,
+                "end_line": 48
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0011",
+          "kind": "function",
+          "name": "test_unparseable_raises",
+          "header_text": "\n    def test_unparseable_raises(self):\n",
+          "span": {
+            "start_line": 49,
+            "end_line": 52
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0025",
+              "text": "        with pytest.raises(ValueError):\n            parse_judge_response(\"I think they are similar\")\n",
+              "kind": "with",
+              "span": {
+                "start_line": 51,
+                "end_line": 52
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0012",
+      "kind": "class",
+      "name": "TestGreedyClustering",
+      "header_text": "\n\nclass TestGreedyClustering:\n",
+      "span": {
+        "start_line": 53,
+        "end_line": 134
+      },
+      "body": [
+        {
+          "type": "scope",
+          "id": "sc-0013",
+          "kind": "function",
+          "name": "test_all_interchangeable_one_cluster",
+          "header_text": "    def test_all_interchangeable_one_cluster(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 56,
+            "end_line": 62
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0026",
+              "text": "        client = VerdictClient(lambda a, b: (\"INTERCHANGEABLE\", None))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 57,
+                "end_line": 57
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0027",
+              "text": "        result = LLMJudgeStrategy().cluster(\n            \"artifact\", [\"s0\", \"s1\", \"s2\", \"s3\"], make_config(), client, Cache(tmp_cache_dir)\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 58,
+                "end_line": 60
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0028",
+              "text": "        assert result.k == 1\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 61,
+                "end_line": 61
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0029",
+              "text": "        assert len(result.assignments) == 4\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 62,
+                "end_line": 62
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0014",
+          "kind": "function",
+          "name": "test_all_different_n_clusters",
+          "header_text": "\n    def test_all_different_n_clusters(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 63,
+            "end_line": 70
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0030",
+              "text": "        client = VerdictClient(lambda a, b: (\"DIFFERENT\", \"content\"))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 65,
+                "end_line": 65
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0031",
+              "text": "        result = LLMJudgeStrategy().cluster(\n            \"artifact\", [\"s0\", \"s1\", \"s2\", \"s3\"], make_config(), client, Cache(tmp_cache_dir)\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 66,
+                "end_line": 68
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0032",
+              "text": "        assert result.k == 4\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 69,
+                "end_line": 69
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0033",
+              "text": "        assert \"content\" in result.difference_labels\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 70,
+                "end_line": 70
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0015",
+          "kind": "function",
+          "name": "test_two_groups",
+          "header_text": "\n    def test_two_groups(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 71,
+            "end_line": 87
+          },
+          "body": [
+            {
+              "type": "scope",
+              "id": "sc-0016",
+              "kind": "function",
+              "name": "verdict_fn",
+              "header_text": "        def verdict_fn(a, b):\n            # Samples prefixed x are one interpretation, y the other.\n",
+              "span": {
+                "start_line": 73,
+                "end_line": 77
+              },
+              "body": [
+                {
+                  "type": "statement",
+                  "id": "st-0034",
+                  "text": "            if a[0] == b[0]:\n                return (\"INTERCHANGEABLE\", None)\n",
+                  "kind": "if",
+                  "span": {
+                    "start_line": 75,
+                    "end_line": 76
+                  },
+                  "authored_by": "Adam Conway",
+                  "authored_at": "2026-07-02T02:43:03Z",
+                  "author_type": "human",
+                  "authorship_context": {
+                    "commit": "97836b7825606e28d73cd124115b163278273a35",
+                    "commit_summary": "Initial commit"
+                  }
+                },
+                {
+                  "type": "statement",
+                  "id": "st-0035",
+                  "text": "            return (\"DIFFERENT\", \"group\")\n",
+                  "kind": "return",
+                  "span": {
+                    "start_line": 77,
+                    "end_line": 77
+                  },
+                  "authored_by": "Adam Conway",
+                  "authored_at": "2026-07-02T02:43:03Z",
+                  "author_type": "human",
+                  "authorship_context": {
+                    "commit": "97836b7825606e28d73cd124115b163278273a35",
+                    "commit_summary": "Initial commit"
+                  }
+                }
+              ],
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0036",
+              "text": "\n        samples = [\"x one\", \"y one\", \"x two\", \"y two\"]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 78,
+                "end_line": 79
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0037",
+              "text": "        client = VerdictClient(verdict_fn)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 80,
+                "end_line": 80
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0038",
+              "text": "        result = LLMJudgeStrategy().cluster(\n            \"artifact\", samples, make_config(), client, Cache(tmp_cache_dir)\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 81,
+                "end_line": 83
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0039",
+              "text": "        assert result.k == 2\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 84,
+                "end_line": 84
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0040",
+              "text": "        assert result.assignments[0] == result.assignments[2]\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 85,
+                "end_line": 85
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0041",
+              "text": "        assert result.assignments[1] == result.assignments[3]\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 86,
+                "end_line": 86
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0042",
+              "text": "        assert result.assignments[0] != result.assignments[1]\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 87,
+                "end_line": 87
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0017",
+          "kind": "function",
+          "name": "test_judge_call_count_is_n_times_k_bounded",
+          "header_text": "\n    def test_judge_call_count_is_n_times_k_bounded(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 88,
+            "end_line": 95
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0043",
+              "text": "        client = VerdictClient(lambda a, b: (\"DIFFERENT\", \"content\"))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 90,
+                "end_line": 90
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0044",
+              "text": "        LLMJudgeStrategy().cluster(\n            \"artifact\", [\"s0\", \"s1\", \"s2\", \"s3\"], make_config(), client, Cache(tmp_cache_dir)\n        )\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 91,
+                "end_line": 93
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0045",
+              "text": "        # All-different worst case: 0 + 1 + 2 + 3 comparisons.\n        assert len(client.calls) == 6\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 94,
+                "end_line": 95
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0018",
+          "kind": "function",
+          "name": "test_judgments_cached_across_runs",
+          "header_text": "\n    def test_judgments_cached_across_runs(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 96,
+            "end_line": 103
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0046",
+              "text": "        cache = Cache(tmp_cache_dir)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 98,
+                "end_line": 98
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0047",
+              "text": "        client = VerdictClient(lambda a, b: (\"INTERCHANGEABLE\", None))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 99,
+                "end_line": 99
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0048",
+              "text": "        LLMJudgeStrategy().cluster(\"artifact\", [\"s0\", \"s1\"], make_config(), client, cache)\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 100,
+                "end_line": 100
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0049",
+              "text": "        client2 = VerdictClient(lambda a, b: (\"INTERCHANGEABLE\", None))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 101,
+                "end_line": 101
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0050",
+              "text": "        LLMJudgeStrategy().cluster(\"artifact\", [\"s0\", \"s1\"], make_config(), client2, cache)\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 102,
+                "end_line": 102
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0051",
+              "text": "        assert client2.calls == []\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 103,
+                "end_line": 103
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0019",
+          "kind": "function",
+          "name": "test_seed_changes_processing_order",
+          "header_text": "\n    def test_seed_changes_processing_order(self, tmp_cache_dir):\n        # Non-transitive verdicts make cluster shapes order-dependent; greedy\n        # clustering absorbs them without crashing (SPEC 4.1).\n",
+          "span": {
+            "start_line": 104,
+            "end_line": 121
+          },
+          "body": [
+            {
+              "type": "scope",
+              "id": "sc-0020",
+              "kind": "function",
+              "name": "verdict_fn",
+              "header_text": "        def verdict_fn(a, b):\n",
+              "span": {
+                "start_line": 108,
+                "end_line": 112
+              },
+              "body": [
+                {
+                  "type": "statement",
+                  "id": "st-0052",
+                  "text": "            pair = {a, b}\n",
+                  "kind": "assign",
+                  "span": {
+                    "start_line": 109,
+                    "end_line": 109
+                  },
+                  "authored_by": "Adam Conway",
+                  "authored_at": "2026-07-02T02:43:03Z",
+                  "author_type": "human",
+                  "authorship_context": {
+                    "commit": "97836b7825606e28d73cd124115b163278273a35",
+                    "commit_summary": "Initial commit"
+                  }
+                },
+                {
+                  "type": "statement",
+                  "id": "st-0053",
+                  "text": "            if pair in ({\"s0\", \"s1\"}, {\"s1\", \"s2\"}):\n                return (\"INTERCHANGEABLE\", None)\n",
+                  "kind": "if",
+                  "span": {
+                    "start_line": 110,
+                    "end_line": 111
+                  },
+                  "authored_by": "Adam Conway",
+                  "authored_at": "2026-07-02T02:43:03Z",
+                  "author_type": "human",
+                  "authorship_context": {
+                    "commit": "97836b7825606e28d73cd124115b163278273a35",
+                    "commit_summary": "Initial commit"
+                  }
+                },
+                {
+                  "type": "statement",
+                  "id": "st-0054",
+                  "text": "            return (\"DIFFERENT\", \"content\")\n",
+                  "kind": "return",
+                  "span": {
+                    "start_line": 112,
+                    "end_line": 112
+                  },
+                  "authored_by": "Adam Conway",
+                  "authored_at": "2026-07-02T02:43:03Z",
+                  "author_type": "human",
+                  "authorship_context": {
+                    "commit": "97836b7825606e28d73cd124115b163278273a35",
+                    "commit_summary": "Initial commit"
+                  }
+                }
+              ],
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0055",
+              "text": "\n        for seed in (0, 1, 2):\n            client = VerdictClient(verdict_fn)\n            result = LLMJudgeStrategy().cluster(\n                \"artifact\", [\"s0\", \"s1\", \"s2\"], make_config(seed=seed), client, Cache(tmp_cache_dir / str(seed))\n            )\n            # If s1 is processed first it represents a cluster both others join\n            # (k=1); otherwise the non-transitive edge forces a split (k=2).\n            assert result.k in (1, 2)\n",
+              "kind": "for",
+              "span": {
+                "start_line": 113,
+                "end_line": 121
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0021",
+          "kind": "function",
+          "name": "test_presentation_order_is_deterministic_per_seed",
+          "header_text": "\n    def test_presentation_order_is_deterministic_per_seed(self, tmp_cache_dir):\n",
+          "span": {
+            "start_line": 122,
+            "end_line": 134
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0056",
+              "text": "        client = VerdictClient(lambda a, b: (\"DIFFERENT\", \"content\"))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 124,
+                "end_line": 124
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0057",
+              "text": "        result1 = LLMJudgeStrategy().cluster(\n            \"artifact\", [\"s0\", \"s1\", \"s2\"], make_config(seed=5), client, Cache(tmp_cache_dir / \"a\")\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 125,
+                "end_line": 127
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0058",
+              "text": "        client2 = VerdictClient(lambda a, b: (\"DIFFERENT\", \"content\"))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 128,
+                "end_line": 128
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0059",
+              "text": "        result2 = LLMJudgeStrategy().cluster(\n            \"artifact\", [\"s0\", \"s1\", \"s2\"], make_config(seed=5), client2, Cache(tmp_cache_dir / \"b\")\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 129,
+                "end_line": 131
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0060",
+              "text": "        orders1 = [r[\"presentation_order\"] for r in result1.pair_records]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 132,
+                "end_line": 132
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0061",
+              "text": "        orders2 = [r[\"presentation_order\"] for r in result2.pair_records]\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 133,
+                "end_line": 133
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0062",
+              "text": "        assert orders1 == orders2\n",
+              "kind": "assert",
+              "span": {
+                "start_line": 134,
+                "end_line": 134
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}

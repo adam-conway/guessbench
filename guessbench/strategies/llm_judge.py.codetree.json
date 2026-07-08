@@ -1,0 +1,945 @@
+{
+  "metadata": {
+    "language": "python",
+    "path": "guessbench/strategies/llm_judge.py",
+    "repo": "guessbench",
+    "commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327",
+    "generated_at": "2026-07-08T07:12:47Z",
+    "generator": "codetree/0.1.0"
+  },
+  "body": [
+    {
+      "type": "statement",
+      "id": "st-0001",
+      "text": "\"\"\"Strategy A: LLM pairwise judge with greedy clustering against representatives (SPEC 4.1-4.2).\"\"\"\n",
+      "kind": "docstring",
+      "span": {
+        "start_line": 1,
+        "end_line": 1
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0002",
+      "text": "\nfrom __future__ import annotations\n",
+      "kind": "import",
+      "span": {
+        "start_line": 2,
+        "end_line": 3
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0003",
+      "text": "\nimport random\n",
+      "kind": "import",
+      "span": {
+        "start_line": 4,
+        "end_line": 5
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0004",
+      "text": "import re\n",
+      "kind": "import",
+      "span": {
+        "start_line": 6,
+        "end_line": 6
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0005",
+      "text": "\nfrom guessbench.cache import Cache, judgment_key\n",
+      "kind": "import",
+      "span": {
+        "start_line": 7,
+        "end_line": 8
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0006",
+      "text": "from guessbench.config import RunConfig, stable_hash\n",
+      "kind": "import",
+      "span": {
+        "start_line": 9,
+        "end_line": 9
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0007",
+      "text": "from guessbench.providers import ModelClient\n",
+      "kind": "import",
+      "span": {
+        "start_line": 10,
+        "end_line": 10
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0008",
+      "text": "from guessbench.strategies.base import ClusteringResult, EquivalenceStrategy\n",
+      "kind": "import",
+      "span": {
+        "start_line": 11,
+        "end_line": 11
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0009",
+      "text": "\nJUDGE_PROMPT_TEMPLATE = \"\"\"You are judging whether two responses to the same request count as the same interpretation of that request.\n\n<request>\n{artifact}\n</request>\n\n<output_A>\n{output_a}\n</output_A>\n\n<output_B>\n{output_b}\n</output_B>\n\nQuestion: would the author of this request consider these two outputs interchangeable — differing only in ways the request left open to chance and the author would not care to distinguish — or meaningfully different?\n\nIgnore differences in wording, phrasing, formatting, or style that do not change what the output substantively is or does. Focus on decisions the request left unresolved: if the two outputs resolved such a decision differently (e.g., different programming language, different tone, different sort direction, different content choices the author would care about), they are DIFFERENT.\n\nAnswer in exactly this format:\nVERDICT: INTERCHANGEABLE\nor\nVERDICT: DIFFERENT\nDIMENSION: <2-5 word label naming the dimension of difference>\"\"\"\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 12,
+        "end_line": 35
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0010",
+      "text": "\n_VERDICT_RE = re.compile(r\"VERDICT:\\s*(INTERCHANGEABLE|DIFFERENT)\", re.IGNORECASE)\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 36,
+        "end_line": 37
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0011",
+      "text": "_DIMENSION_RE = re.compile(r\"DIMENSION:\\s*(.+)\", re.IGNORECASE)\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 38,
+        "end_line": 38
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "statement",
+      "id": "st-0012",
+      "text": "_THINK_RE = re.compile(r\"<think>.*?</think>\", re.DOTALL)\n",
+      "kind": "assign",
+      "span": {
+        "start_line": 39,
+        "end_line": 39
+      },
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0001",
+      "kind": "function",
+      "name": "parse_judge_response",
+      "header_text": "\n\ndef parse_judge_response(text: str) -> tuple[str, str | None]:\n",
+      "span": {
+        "start_line": 40,
+        "end_line": 57
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0013",
+          "text": "    \"\"\"Extract (verdict, dimension_label) from a judge response.\n\n    Reasoning-model think blocks are stripped first; the last VERDICT found wins.\n    Unparseable responses raise, surfacing judge failures instead of guessing.\n    \"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 43,
+            "end_line": 47
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0014",
+          "text": "    cleaned = _THINK_RE.sub(\"\", text)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 48,
+            "end_line": 48
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0015",
+          "text": "    verdicts = _VERDICT_RE.findall(cleaned)\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 49,
+            "end_line": 49
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0016",
+          "text": "    if not verdicts:\n        raise ValueError(f\"Judge response contains no parseable verdict: {text[:200]!r}\")\n",
+          "kind": "if",
+          "span": {
+            "start_line": 50,
+            "end_line": 51
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0017",
+          "text": "    verdict = verdicts[-1].upper()\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 52,
+            "end_line": 52
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0018",
+          "text": "    label = None\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 53,
+            "end_line": 53
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0019",
+          "text": "    if verdict == \"DIFFERENT\":\n        match = _DIMENSION_RE.search(cleaned)\n        label = match.group(1).strip().strip(\".\").lower() if match else \"unlabeled\"\n",
+          "kind": "if",
+          "span": {
+            "start_line": 54,
+            "end_line": 56
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0020",
+          "text": "    return verdict, label\n",
+          "kind": "return",
+          "span": {
+            "start_line": 57,
+            "end_line": 57
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0002",
+      "kind": "class",
+      "name": "LLMJudgeStrategy",
+      "header_text": "\n\nclass LLMJudgeStrategy(EquivalenceStrategy):\n",
+      "span": {
+        "start_line": 58,
+        "end_line": 172
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0021",
+          "text": "    strategy_id = \"llm_judge\"\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 61,
+            "end_line": 61
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0022",
+          "text": "    version = \"v1\"\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 62,
+            "end_line": 62
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0003",
+          "kind": "function",
+          "name": "_judge_pair",
+          "header_text": "\n    def _judge_pair(\n        self,\n        artifact_text: str,\n        text_i: str,\n        text_j: str,\n        order: str,\n        config: RunConfig,\n        client: ModelClient,\n        cache: Cache,\n    ) -> tuple[str, str | None]:\n",
+          "span": {
+            "start_line": 63,
+            "end_line": 111
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0023",
+              "text": "        \"\"\"One independent judge call (no accumulated context, SPEC 9), cached with\n        presentation order in the key.\"\"\"\n",
+              "kind": "docstring",
+              "span": {
+                "start_line": 74,
+                "end_line": 75
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0024",
+              "text": "        output_a, output_b = (text_i, text_j) if order == \"AB\" else (text_j, text_i)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 76,
+                "end_line": 76
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0025",
+              "text": "        key = judgment_key(\n            config.judge_model,\n            config.judge_prompt_version,\n            artifact_text,\n            output_a,\n            output_b,\n            order,\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 77,
+                "end_line": 84
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0026",
+              "text": "        cached = cache.get(\"judgments\", key)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 85,
+                "end_line": 85
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0027",
+              "text": "        if cached is not None:\n            return cached[\"verdict\"], cached.get(\"label\")\n",
+              "kind": "if",
+              "span": {
+                "start_line": 86,
+                "end_line": 87
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0028",
+              "text": "\n        prompt = JUDGE_PROMPT_TEMPLATE.format(\n            artifact=artifact_text, output_a=output_a, output_b=output_b\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 88,
+                "end_line": 91
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0029",
+              "text": "        raw = client.complete(\n            model=config.judge_model,\n            prompt=prompt,\n            temperature=0.0,\n            max_tokens=2000,\n        )\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 92,
+                "end_line": 97
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0030",
+              "text": "        verdict, label = parse_judge_response(raw)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 98,
+                "end_line": 98
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0031",
+              "text": "        cache.put(\n            \"judgments\",\n            key,\n            {\n                \"verdict\": verdict,\n                \"label\": label,\n                \"raw\": raw,\n                \"presentation_order\": order,\n                \"judge_model\": config.judge_model,\n                \"judge_prompt_version\": config.judge_prompt_version,\n            },\n        )\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 99,
+                "end_line": 110
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0032",
+              "text": "        return verdict, label\n",
+              "kind": "return",
+              "span": {
+                "start_line": 111,
+                "end_line": 111
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "scope",
+          "id": "sc-0004",
+          "kind": "function",
+          "name": "cluster",
+          "header_text": "\n    def cluster(\n        self,\n        artifact_text: str,\n        samples: list[str],\n        config: RunConfig,\n        client: ModelClient,\n        cache: Cache,\n    ) -> ClusteringResult:\n",
+          "span": {
+            "start_line": 112,
+            "end_line": 172
+          },
+          "body": [
+            {
+              "type": "statement",
+              "id": "st-0033",
+              "text": "        n = len(samples)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 121,
+                "end_line": 121
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0034",
+              "text": "        order_indices = list(range(n))\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 122,
+                "end_line": 122
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0035",
+              "text": "        rng = random.Random(config.seed)\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 123,
+                "end_line": 123
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0036",
+              "text": "        rng.shuffle(order_indices)\n",
+              "kind": "expr",
+              "span": {
+                "start_line": 124,
+                "end_line": 124
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0037",
+              "text": "\n        # clusters: list of member sample-indices; first member is the representative.\n        clusters: list[list[int]] = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 125,
+                "end_line": 127
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0038",
+              "text": "        difference_labels: list[str] = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 128,
+                "end_line": 128
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0039",
+              "text": "        pair_records: list[dict] = []\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 129,
+                "end_line": 129
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0040",
+              "text": "        # Judgment graph over sample indices, for non-transitivity scanning.\n        judged: dict[tuple[int, int], str] = {}\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 130,
+                "end_line": 131
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0041",
+              "text": "\n        for idx in order_indices:\n            joined = False\n            for cluster in clusters:\n                rep = cluster[0]\n                # Seeded per-pair presentation order (washes out position bias, SPEC 4.2).\n                pair_seed = stable_hash(config.seed, artifact_text, rep, idx)\n                order = \"AB\" if random.Random(pair_seed).random() < 0.5 else \"BA\"\n                verdict, label = self._judge_pair(\n                    artifact_text, samples[idx], samples[rep], order, config, client, cache\n                )\n                judged[(min(idx, rep), max(idx, rep))] = verdict\n                pair_records.append(\n                    {\n                        \"sample_i\": idx,\n                        \"sample_j\": rep,\n                        \"verdict\": verdict,\n                        \"label\": label,\n                        \"presentation_order\": order,\n                    }\n                )\n                if verdict == \"INTERCHANGEABLE\":\n                    cluster.append(idx)\n                    joined = True\n                    break\n                if label:\n                    difference_labels.append(label)\n            if not joined:\n                clusters.append([idx])\n",
+              "kind": "for",
+              "span": {
+                "start_line": 132,
+                "end_line": 160
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0042",
+              "text": "\n        assignments = [0] * n\n",
+              "kind": "assign",
+              "span": {
+                "start_line": 161,
+                "end_line": 162
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0043",
+              "text": "        for cluster_id, members in enumerate(clusters):\n            for member in members:\n                assignments[member] = cluster_id\n",
+              "kind": "for",
+              "span": {
+                "start_line": 163,
+                "end_line": 165
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            },
+            {
+              "type": "statement",
+              "id": "st-0044",
+              "text": "\n        return ClusteringResult(\n            assignments=assignments,\n            difference_labels=difference_labels,\n            non_transitivity_log=_find_non_transitive_triples(judged),\n            pair_records=pair_records,\n        )\n",
+              "kind": "return",
+              "span": {
+                "start_line": 166,
+                "end_line": 172
+              },
+              "authored_by": "Adam Conway",
+              "authored_at": "2026-07-02T02:43:03Z",
+              "author_type": "human",
+              "authorship_context": {
+                "commit": "97836b7825606e28d73cd124115b163278273a35",
+                "commit_summary": "Initial commit"
+              }
+            }
+          ],
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    },
+    {
+      "type": "scope",
+      "id": "sc-0005",
+      "kind": "function",
+      "name": "_find_non_transitive_triples",
+      "header_text": "\n\ndef _find_non_transitive_triples(judged: dict[tuple[int, int], str]) -> list[dict]:\n",
+      "span": {
+        "start_line": 173,
+        "end_line": 196
+      },
+      "body": [
+        {
+          "type": "statement",
+          "id": "st-0045",
+          "text": "    \"\"\"Scan recorded judgments for triples where A~B, B~C, but A!~C (SPEC 4.1).\n\n    The pinned greedy algorithm stops at the first INTERCHANGEABLE match, so fully\n    judged inconsistent triangles are rare; this logs any that do appear.\n    \"\"\"\n",
+          "kind": "docstring",
+          "span": {
+            "start_line": 176,
+            "end_line": 180
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0046",
+          "text": "    nodes = sorted({i for pair in judged for i in pair})\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 181,
+            "end_line": 181
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0047",
+          "text": "    inconsistent = []\n",
+          "kind": "assign",
+          "span": {
+            "start_line": 182,
+            "end_line": 182
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0048",
+          "text": "    for a_pos, a in enumerate(nodes):\n        for b in nodes[a_pos + 1 :]:\n            for c in nodes:\n                if c <= b:\n                    continue\n                ab = judged.get((a, b))\n                bc = judged.get((b, c))\n                ac = judged.get((a, c))\n                if None in (ab, bc, ac):\n                    continue\n                same = [ab, bc, ac].count(\"INTERCHANGEABLE\")\n                if same == 2:\n                    inconsistent.append({\"triple\": [a, b, c], \"verdicts\": [ab, bc, ac]})\n",
+          "kind": "for",
+          "span": {
+            "start_line": 183,
+            "end_line": 195
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        },
+        {
+          "type": "statement",
+          "id": "st-0049",
+          "text": "    return inconsistent\n",
+          "kind": "return",
+          "span": {
+            "start_line": 196,
+            "end_line": 196
+          },
+          "authored_by": "Adam Conway",
+          "authored_at": "2026-07-02T02:43:03Z",
+          "author_type": "human",
+          "authorship_context": {
+            "commit": "97836b7825606e28d73cd124115b163278273a35",
+            "commit_summary": "Initial commit"
+          }
+        }
+      ],
+      "authored_by": "Adam Conway",
+      "authored_at": "2026-07-02T02:43:03Z",
+      "author_type": "human",
+      "authorship_context": {
+        "commit": "97836b7825606e28d73cd124115b163278273a35",
+        "commit_summary": "Initial commit"
+      }
+    }
+  ]
+}
