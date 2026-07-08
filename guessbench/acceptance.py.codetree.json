@@ -295,6 +295,18 @@
       "authorship_context": {
         "commit": "97836b7825606e28d73cd124115b163278273a35",
         "commit_summary": "Initial commit"
+      },
+      "meta": {
+        "knowledge": [
+          {
+            "kind": "improvement",
+            "question": "Why does A4 require both an absolute floor (4.0) and a 2x margin over A2's EI, rather than just one constraint?",
+            "answer": "The variable names are not descriptive. \"A4\" for example is pretty meaningless",
+            "answered_by": "adam-conway",
+            "answered_at": "2026-07-08T18:32:19Z",
+            "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327"
+          }
+        ]
       }
     },
     {
@@ -312,6 +324,18 @@
       "authorship_context": {
         "commit": "97836b7825606e28d73cd124115b163278273a35",
         "commit_summary": "Initial commit"
+      },
+      "meta": {
+        "knowledge": [
+          {
+            "kind": "improvement",
+            "question": "Why does A4 require both an absolute floor (4.0) and a 2x margin over A2's EI, rather than just one constraint?",
+            "answer": "The variable names are not descriptive. \"A4\" for example is pretty meaningless",
+            "answered_by": "adam-conway",
+            "answered_at": "2026-07-08T18:32:19Z",
+            "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327"
+          }
+        ]
       }
     },
     {
@@ -706,6 +730,18 @@
           "authorship_context": {
             "commit": "97836b7825606e28d73cd124115b163278273a35",
             "commit_summary": "Initial commit"
+          },
+          "meta": {
+            "knowledge": [
+              {
+                "kind": "improvement",
+                "question": "Why does A4 require both an absolute floor (4.0) and a 2x margin over A2's EI, rather than just one constraint?",
+                "answer": "The variable names are not descriptive. \"A4\" for example is pretty meaningless",
+                "answered_by": "adam-conway",
+                "answered_at": "2026-07-08T18:32:19Z",
+                "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327"
+              }
+            ]
           }
         },
         {
@@ -1685,6 +1721,17 @@
           "authorship_context": {
             "commit": "97836b7825606e28d73cd124115b163278273a35",
             "commit_summary": "Initial commit"
+          },
+          "meta": {
+            "knowledge": [
+              {
+                "kind": "gap",
+                "question": "When multiple thresholds pass all tests, why pick the median threshold rather than, say, the lowest or highest passing value?",
+                "answered_by": "adam-conway",
+                "answered_at": "2026-07-08T18:32:19Z",
+                "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327"
+              }
+            ]
           }
         },
         {
@@ -1702,6 +1749,17 @@
           "authorship_context": {
             "commit": "97836b7825606e28d73cd124115b163278273a35",
             "commit_summary": "Initial commit"
+          },
+          "meta": {
+            "knowledge": [
+              {
+                "kind": "gap",
+                "question": "When multiple thresholds pass all tests, why pick the median threshold rather than, say, the lowest or highest passing value?",
+                "answered_by": "adam-conway",
+                "answered_at": "2026-07-08T18:32:19Z",
+                "source_commit": "76289222a18dd3c1e44cd5b9cf368af0482f8327"
+              }
+            ]
           }
         },
         {
